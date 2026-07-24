@@ -7,8 +7,6 @@ function TodoExplorer() {
   const [todos, setTodos] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const todosPerPage = 10;
 
@@ -25,221 +23,103 @@ function TodoExplorer() {
     }
   };
 
-  // Reset page when search/filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filter]);
 
   let filteredTodos = [...todos];
 
-  // Filter
   if (filter === "completed") {
-    filteredTodos = filteredTodos.filter(
-      (todo) => todo.completed
-    );
+    filteredTodos = filteredTodos.filter((todo) => todo.completed);
   }
 
   if (filter === "pending") {
-    filteredTodos = filteredTodos.filter(
-      (todo) => !todo.completed
-    );
+    filteredTodos = filteredTodos.filter((todo) => !todo.completed);
   }
 
-  // Search
   if (search.trim()) {
     filteredTodos = filteredTodos.filter((todo) =>
-      todo.title
-        .toLowerCase()
-        .includes(search.toLowerCase())
+      todo.title.toLowerCase().includes(search.toLowerCase())
     );
   }
 
-  // Pagination Logic
- const totalPages = Math.max(
-  1,
-  Math.ceil(filteredTodos.length / todosPerPage)
-);
-
-  const startIndex =
-    (currentPage - 1) * todosPerPage;
-
-  const paginatedTodos = filteredTodos.slice(
-    startIndex,
-    startIndex + todosPerPage
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredTodos.length / todosPerPage));
+  const startIndex = (currentPage - 1) * todosPerPage;
+  const paginatedTodos = filteredTodos.slice(startIndex, startIndex + todosPerPage);
 
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "20px",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-        }}
-      >
-        Todos Explorer
-      </h1>
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl shadow-slate-200/70 backdrop-blur sm:p-8">
+        <h1 className="mb-6 text-center text-3xl font-semibold text-slate-800 sm:text-4xl">
+          Todos Explorer
+        </h1>
 
-      {/* Search */}
-      <SearchBar
-        search={search}
-        setSearch={setSearch}
-      />
+        <SearchBar search={search} setSearch={setSearch} />
 
-      {/* Filter Buttons */}
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          margin: "20px 0",
-        }}
-      >
-        <button
-          onClick={() => setFilter("all")}
-          style={{
-            padding: "10px 16px",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            background:
-              filter === "all"
-                ? "#2563eb"
-                : "#d1d5db",
-            color:
-              filter === "all"
-                ? "#fff"
-                : "#000",
-          }}
-        >
-          All
-        </button>
+        <div className="my-5 flex flex-wrap gap-3">
+          {[
+            { label: "All", value: "all" },
+            { label: "Completed", value: "completed" },
+            { label: "Pending", value: "pending" },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setFilter(option.value)}
+              className={`rounded-lg px-4 py-2 font-medium transition ${
+                filter === option.value
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
 
-        <button
-          onClick={() => setFilter("completed")}
-          style={{
-            padding: "10px 16px",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            background:
-              filter === "completed"
-                ? "#2563eb"
-                : "#d1d5db",
-            color:
-              filter === "completed"
-                ? "#fff"
-                : "#000",
-          }}
-        >
-          Completed
-        </button>
+        <div className="space-y-3">
+          {paginatedTodos.map((todo) => (
+            <TodoCard key={todo.id} todo={todo} search={search} />
+          ))}
+        </div>
 
-        <button
-          onClick={() => setFilter("pending")}
-          style={{
-            padding: "10px 16px",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            background:
-              filter === "pending"
-                ? "#2563eb"
-                : "#d1d5db",
-            color:
-              filter === "pending"
-                ? "#fff"
-                : "#000",
-          }}
-        >
-          Pending
-        </button>
-      </div>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
 
-      {/* Todo Cards */}
-      {paginatedTodos.map((todo) => (
-        <TodoCard
-          key={todo.id}
-          todo={todo}
-          search={search}
-        />
-      ))}
-
-      {/* Pagination */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "10px",
-          marginTop: "25px",
-        }}
-      >
-        <button
-          disabled={currentPage === 1}
-          onClick={() =>
-            setCurrentPage((prev) => prev - 1)
-          }
-        >
-          Previous
-        </button>
-
-        {Array.from(
-          { length: totalPages },
-          (_, index) => (
+          {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index}
-              onClick={() =>
-                setCurrentPage(index + 1)
-              }
-              style={{
-                padding: "8px 12px",
-                border: "1px solid #ccc",
-                borderRadius: "6px",
-                cursor: "pointer",
-                background:
-                  currentPage === index + 1
-                    ? "#2563eb"
-                    : "#fff",
-                color:
-                  currentPage === index + 1
-                    ? "#fff"
-                    : "#000",
-              }}
+              onClick={() => setCurrentPage(index + 1)}
+              className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                currentPage === index + 1
+                  ? "bg-blue-600 text-white"
+                  : "border border-slate-300 text-slate-700"
+              }`}
             >
               {index + 1}
             </button>
-          )
-        )}
+          ))}
 
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() =>
-            setCurrentPage((prev) => prev + 1)
-          }
-        >
-          Next
-        </button>
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+
+        <div className="mt-6 border-t border-slate-200 pt-4 text-center text-sm font-medium text-slate-600">
+          Showing {filteredTodos.length} of {todos.length} todos
+          <br />
+          Page {currentPage} of {totalPages}
+        </div>
       </div>
-
-    {/* Footer */}
-<div
-  style={{
-    marginTop: "25px",
-    padding: "15px",
-    borderTop: "1px solid #ddd",
-    textAlign: "center",
-    fontWeight: "600",
-  }}
->
-  Showing {filteredTodos.length} of {todos.length} todos
-  <br />
-  Page {currentPage} of {totalPages}
-</div>
     </div>
   );
 }

@@ -5,49 +5,29 @@ function TodoCard({ todo, search }) {
 
   return (
     <div
-      style={{
-        backgroundColor: isMatched ? "#FFF9C4" : "#fff",
-        border: "1px solid #ddd",
-        borderRadius: "10px",
-        padding: "20px",
-        marginBottom: "15px",
-      }}
+      className={`rounded-2xl border p-5 shadow-sm ${
+        isMatched
+          ? "border-yellow-300 bg-yellow-50"
+          : "border-slate-200 bg-white"
+      }`}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-        }}
-      >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h3
-            style={{
-              margin: 0,
-              marginBottom: "8px",
-              textAlign: "left",
-            }}
-          >
+          <h3 className="mb-2 text-left text-lg font-semibold text-slate-800">
             {todo.title}
           </h3>
 
-          <p
-            style={{
-              margin: 0,
-              textAlign: "left",
-              color: "#666",
-            }}
-          >
+          <p className="text-left text-sm text-slate-500">
             ID: {todo.id} • User: {todo.userId}
           </p>
         </div>
 
         <span
-          style={{
-            fontWeight: "600",
-            color: todo.completed ? "green" : "orange",
-            alignSelf: "center",
-          }}
+          className={`inline-flex self-start rounded-full px-3 py-1 text-sm font-semibold ${
+            todo.completed
+              ? "bg-emerald-100 text-emerald-700"
+              : "bg-amber-100 text-amber-700"
+          }`}
         >
           {todo.completed ? "Completed" : "Pending"}
         </span>
